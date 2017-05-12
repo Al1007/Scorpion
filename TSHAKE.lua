@@ -1062,12 +1062,12 @@ elseif msg_type == 'MSG:NewUserAdd' then
     if database:get('welcome:'..msg.chat_id_) then
         text = database:get('welcome:'..msg.chat_id_)
     else
-        text = 'Hi {firstname} 😃'
+        text = '*Hi {firstname} 😃*'
     end
     local text = text:gsub('{firstname}',(msg.content_.members_[0].first_name_ or ''))
     local text = text:gsub('{lastname}',(msg.content_.members_[0].last_name_ or ''))
     local text = text:gsub('{username}',('@'..msg.content_.members_[0].username_ or ''))
-         send(msg.chat_id_, msg.id_, 1, text, 1, 'html')
+         send(msg.chat_id_, msg.id_, 1, text, 1, 'md')
    end
 elseif msg_type == 'MSG:Contact' then
  if not is_mod(msg.sender_user_id_, msg.chat_id_) then
@@ -2904,7 +2904,7 @@ end
                 else
                   send(msg.chat_id_, msg.id_, 1, '> `تم قفل التعديل للمجموعه`', 1, 'md')
                 end
-                database:set('editmsg'..msg.chat_id_,'delmsg')
+                database:set('editmsg'..msg.chat_id_,true)
               else
                 if database:get('lang:gp:'..msg.chat_id_) then
                   send(msg.chat_id_, msg.id_, 1, '_> Lock edit is already_ *locked*', 1, 'md')
@@ -3108,34 +3108,33 @@ end
 	  end
  	end
 	
-	if text:match("^[Ww][Ll][Cc] [Oo][Nn]$") and is_mod(msg.sender_user_id_, msg.chat_id_) then
+	-----------------------------------------------------------------------------------------------
+	if text:match("^[Ww][Ll][Cc] [Oo][Nn]$") or text:match("^تفعيل الترحيب$") and is_mod(msg.sender_user_id_, msg.chat_id_) then
+                if database:get('lang:gp:'..msg.chat_id_) then
+		 database:set("bot:welcome"..msg.chat_id_,true)
          send(msg.chat_id_, msg.id_, 1, '#Done\nWelcome *Enabled* In This Supergroup.', 1, 'md')
-		 database:set("bot:welcome"..msg.chat_id_,true)
-	end
-	if text:match("^[Ww][Ll][Cc] [Oo][Ff][Ff]$") and is_mod(msg.sender_user_id_, msg.chat_id_) then
-         send(msg.chat_id_, msg.id_, 1, '#Done\nWelcome *Disabled* In This Supergroup.', 1, 'md')
-		 database:del("bot:welcome"..msg.chat_id_)
-	end
-	
-	if text:match("^تفعيل الترحيب$") and is_mod(msg.sender_user_id_, msg.chat_id_) then
+       else 
          send(msg.chat_id_, msg.id_, 1, '`تم تفعيل الترحيب بالمجموعه`', 1, 'md')
-		 database:set("bot:welcome"..msg.chat_id_,true)
+end
 	end
-	if text:match("^تعطيل الترحيب$") and is_mod(msg.sender_user_id_, msg.chat_id_) then
-         send(msg.chat_id_, msg.id_, 1, '`تم تعطيل الترحيب بالمجموعه`', 1, 'md')
+	if text:match("^[Ww][Ll][Cc] [Oo][Ff][Ff]$") or text:match("^تعطيل الترحيب$") and is_mod(msg.sender_user_id_, msg.chat_id_) then
+                if database:get('lang:gp:'..msg.chat_id_) then
 		 database:del("bot:welcome"..msg.chat_id_)
-	end
+         send(msg.chat_id_, msg.id_, 1, '#Done\nWelcome *Disabled* In This Supergroup.', 1, 'md')
+       else 
+         send(msg.chat_id_, msg.id_, 1, '`تم تفعيل الترحيب بالمجموعه`', 1, 'md')
+end
+end 
 
+          local text = msg.content_.text_:gsub('وضع ترحيب','set wlc')
 	if text:match("^[Ss][Ee][Tt] [Ww][Ll][Cc] (.*)$") and is_mod(msg.sender_user_id_, msg.chat_id_) then
 	local welcome = {string.match(text, "^([Ss][Ee][Tt] [Ww][Ll][Cc]) (.*)$")} 
+                if database:get('lang:gp:'..msg.chat_id_) then
+		 database:set('welcome:'..msg.chat_id_,welcome[2])
          send(msg.chat_id_, msg.id_, 1, '*Welcome Msg Has Been Saved!*\nWlc Text:\n\n`'..welcome[2]..'`', 1, 'md')
-		 database:set('welcome:'..msg.chat_id_,welcome[2])
-	end
-	
-	if text:match("^وضع ترحيب (.*)$") and is_mod(msg.sender_user_id_, msg.chat_id_) then
-	local welcome = {string.match(text, "^(وضع ترحيب) (.*)$")} 
+       else 
          send(msg.chat_id_, msg.id_, 1, '`تم وضع الترحيب `:\n\n`'..welcome[2]..'`', 1, 'md')
-		 database:set('welcome:'..msg.chat_id_,welcome[2])
+end
 	end
 
           local text = msg.content_.text_:gsub('حذف الترحيب','del wlc')
@@ -6363,7 +6362,7 @@ end
 	end
 	-----------------------------------------------------------------------------------------------
   	if text:match("^[Dd][Ee][Vv]$") or text:match("^المطور$") and msg.reply_to_message_id_ == 0 then
-       sendContact(msg.chat_id_, msg.id_, 0, 1, nil, 9647707641864, '┋|| ♯םـــۄ୭دُʟ̤ɾ║☻➺❥ ||┋', '', bot_id)
+       sendContact(msg.chat_id_, msg.id_, 0, 1, nil, 9647708426878, '┋|| Ali║☻➺❥ ||┋', '', bot_id)
     end
 	-----------------------------------------------------------------------------------------------
           local text = msg.content_.text_:gsub('وضع اسم','setname')
@@ -7334,18 +7333,18 @@ if text:match("^source") or text:match("^الاصدار") or text:match("^الس
    local text =  [[
 <code>اهلا بك في سورس تشاكي</code>
 
-<code>المطورين : </code>
+<code>المطور : </code>
 
-<b>Dev | </b>@lIMyIl
-<b>Dev | </b>@IX00XI
-<b>Dev | </b>@lIESIl
-<b>Dev | </b>@H_173
-<b>Dev | </b>@h_k_a
-<b>Dev | </b>@EMADOFFICAL
+<b>Dev | </b>@A1imrj7
+<b>Dev | </b>@A1imrj7
+<b>Dev | </b>@A1imrj7
+<b>Dev | </b>@A1imrj7
+<b>Dev | </b>@A1imrj7
+<b>Dev | </b>@A1imrj7
 
 <code>قناه السورس : </code>
 
-<b>Channel | </b>@lTSHAKEl_CH
+<b>Channel | </b>@A1imrj7
 
 <code>رابط Github :</code>
 
@@ -7480,11 +7479,11 @@ end
   -----------------------------------------------------------------------------------------------
 end
 
---[[                                    Dev @lIMyIl         
-   _____    _        _    _    _____    Dev @EMADOFFICAL 
-  |_   _|__| |__    / \  | | _| ____|   Dev @h_k_a  
-    | |/ __| '_ \  / _ \ | |/ /  _|     Dev @IX00XI
-    | |\__ \ | | |/ ___ \|   <| |___    Dev @H_173
-    |_||___/_| |_/_/   \_\_|\_\_____|   Dev @lIESIl
-              CH > @TshAkETEAM
+--[[                                    Dev @A1imrj7        
+   _____    _        _    _    _____    Dev @A1imrj7 
+  |_   _|__| |__    / \  | | _| ____|   Dev @A1imrj7  
+    | |/ __| '_ \  / _ \ | |/ /  _|     Dev @A1imrj7
+    | |\__ \ | | |/ ___ \|   <| |___    Dev @A1imrj7
+    |_||___/_| |_/_/   \_\_|\_\_____|   Dev @A1imrj7
+              CH > @A1imrj7
 --]]
